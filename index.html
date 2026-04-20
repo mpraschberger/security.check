@@ -1,174 +1,294 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sicherheits-Demo – Fake Google Login</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sicherheits-Demo: Phishing erkennen</title>
+  <style>
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:#fafafa;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      margin:0;
+    }
+    .login-container{
+      background:#fff;
+      border:1px solid #dbdbdb;
+      width:360px;
+      padding:36px;
+      text-align:center;
+      box-sizing:border-box;
+      border-radius:10px;
+      box-shadow:0 4px 12px rgba(0,0,0,.06);
+      position:relative;
+      overflow:hidden;
+    }
 
-<style>
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #f1f3f4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
+    /* Trainings-Banner (absichtlich deutlich) */
+    .training-banner{
+      position:absolute;
+      top:0; left:0; right:0;
+      background:#fff4cc;
+      color:#6a4b00;
+      font-size:12px;
+      padding:8px 10px;
+      border-bottom:1px solid #ffe08a;
+      font-weight:700;
+      letter-spacing:.2px;
+    }
 
-.login-container {
-    background-color: #ffffff;
-    width: 360px;
-    padding: 40px 35px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    text-align: center;
-}
+    .logo-container{
+      margin:34px 0 22px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+    }
+    .logo-icon{ width:72px; height:72px; }
+    .logo-text{
+      font-size:26px;
+      font-weight:800;
+      color:#262626;
+      letter-spacing:-0.8px;
+      background:linear-gradient(45deg,#6c63ff 0%, #00bfa6 45%, #ffb703 75%, #ef476f 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
 
-.logo-container {
-    margin-bottom: 25px;
-}
+    .subtitle{
+      font-size:14px;
+      color:#555;
+      margin-bottom:18px;
+      line-height:1.4;
+    }
 
-.logo-icon {
-    width: 72px;
-    height: 72px;
-    margin-bottom: 12px;
-}
+    input{
+      width:100%;
+      padding:12px;
+      margin-bottom:10px;
+      border:1px solid #dbdbdb;
+      border-radius:6px;
+      background:#fafafa;
+      box-sizing:border-box;
+      font-size:14px;
+    }
+    input:focus{ border-color:#a8a8a8; outline:none; }
 
-/* Google‑ähnlicher, aber eigener Text */
-.logo-text {
-    font-size: 26px;
-    font-weight: 600;
-    letter-spacing: -0.3px;
-}
+    /* Passwort optisch maskieren, aber NICHT type=password => weniger Passwortmanager-Popups */
+    .masked{
+      -webkit-text-security: disc;
+      text-security: disc;
+    }
 
-.logo-text span:nth-child(1) { color: #4285f4; }
-.logo-text span:nth-child(2) { color: #ea4335; }
-.logo-text span:nth-child(3) { color: #fbbc05; }
-.logo-text span:nth-child(4) { color: #34a853; }
+    button{
+      width:100%;
+      padding:12px;
+      background:#0095f6;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      font-weight:700;
+      cursor:pointer;
+      font-size:14px;
+      margin-top:10px;
+      opacity: .55;
+    }
+    button.enabled{ opacity:1; }
+    button:hover.enabled{ background:#1877f2; }
 
-.subtitle {
-    font-size: 14px;
-    color: #5f6368;
-    margin: 15px 0 25px;
-}
+    .consent{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      text-align:left;
+      margin-top:10px;
+      padding:10px 12px;
+      background:#f7f7f7;
+      border:1px solid #eee;
+      border-radius:8px;
+      font-size:12px;
+      color:#555;
+    }
+    .consent input{ width:auto; margin:2px 0 0; }
 
-input {
-    width: 100%;
-    padding: 12px;
-    font-size: 14px;
-    margin-bottom: 12px;
-    border-radius: 6px;
-    border: 1px solid #dadce0;
-}
+    .demo-note{
+      margin-top:18px;
+      color:#8e8e8e;
+      font-size:12px;
+      border-top:1px solid #eee;
+      padding-top:12px;
+    }
 
-input:focus {
-    outline: none;
-    border-color: #4285f4;
-}
+    .warning-overlay{
+      display:none;
+      position:fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,.86);
+      color:#fff;
+      justify-content:center;
+      align-items:center;
+      z-index:1000;
+      flex-direction:column;
+      padding:20px;
+      box-sizing:border-box;
+    }
+    .warning-box{
+      background:#d9534f;
+      padding:28px;
+      border-radius:12px;
+      border:2px solid #fff;
+      max-width:520px;
+      text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    .warning-box h1{ margin:0 0 10px; font-size:22px; }
+    .warning-box p{ margin:8px 0; line-height:1.4; }
 
-button {
-    width: 100%;
-    background-color: #1a73e8;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-}
+    .data-box{
+      text-align:left;
+      display:inline-block;
+      background:rgba(0,0,0,.2);
+      padding:12px 18px;
+      border-radius:10px;
+      margin:12px 0 6px;
+      font-size:14px;
+    }
+    .data-box strong{ color:#ffdddd; }
 
-button:hover {
-    background-color: #1558b0;
-}
-
-.demo-note {
-    font-size: 11px;
-    color: #999;
-    margin-top: 25px;
-}
-
-/* PHISHING WARNUNG */
-.warning-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.warning-box {
-    background: #d93025;
-    color: white;
-    padding: 35px;
-    border-radius: 14px;
-    max-width: 420px;
-    text-align: center;
-}
-
-.warning-box h1 {
-    margin-top: 0;
-}
-
-.warning-box ul {
-    text-align: left;
-    display: inline-block;
-    margin-top: 15px;
-}
-
-.warning-box button {
-    margin-top: 20px;
-    background: white;
-    color: #d93025;
-}
-</style>
+    .btn-close{
+      background:#fff !important;
+      color:#d9534f !important;
+      margin-top:16px;
+      font-weight:800 !important;
+      border-radius:8px !important;
+      padding:12px !important;
+      width:100%;
+      cursor:pointer;
+      border:none;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="login-container">
+    <div class="training-banner">SICHERHEITS‑TRAINING · Bitte keine echten Zugangsdaten eingeben</div>
 
-<div class="login-container">
     <div class="logo-container">
-        <!-- Google‑ähnliches SVG‑Icon -->
-        <svg class="logo-icon" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="60" cy="60" r="52" fill="#ffffff" stroke="#e0e0e0" stroke-width="4"/>
+      <!-- neutrales Demo-Icon -->
+      <svg class="logo-icon" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-label="Demo Sicherheitslogo">
+        <circle cx="60" cy="60" r="54" fill="#f5f7fa"/>
+        <path d="M60 14 A46 46 0 0 1 106 60" stroke="#6c63ff" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path d="M106 60 A46 46 0 0 1 60 106" stroke="#00bfa6" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path d="M60 106 A46 46 0 0 1 14 60" stroke="#ffb703" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path d="M14 60 A46 46 0 0 1 60 14" stroke="#ef476f" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path d="M40 62 L54 76 L82 44" fill="none" stroke="#333" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
 
-            <path d="M60 12 A48 48 0 0 1 108 60"
-                  stroke="#4285f4" stroke-width="10" fill="none" stroke-linecap="round"/>
-            <path d="M108 60 A48 48 0 0 1 60 108"
-                  stroke="#34a853" stroke-width="10" fill="none" stroke-linecap="round"/>
-            <path d="M60 108 A48 48 0 0 1 12 60"
-                  stroke="#fbbc05" stroke-width="10" fill="none" stroke-linecap="round"/>
-            <path d="M12 60 A48 48 0 0 1 60 12"
-                  stroke="#ea4335" stroke-width="10" fill="none" stroke-linecap="round"/>
-
-            <!-- Verifikations-Haken -->
-            <path d="M40 62 L54 76 L82 44"
-                  fill="none" stroke="#444" stroke-width="8"
-                  stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-
-        <div class="logo-text">
-            <span>S</span><span>e</span><span>a</span><span>rchVerify</span>
-        </div>
+      <div class="logo-text">VerifyBadge</div>
     </div>
 
-    <div class="subtitle">
-        Konto verifizieren, um vollen Zugriff zu behalten
-    </div>
+    <p class="subtitle">
+      Demo‑Anmeldung zur Erkennung von Phishing.<br>
+      <strong>Gib hier keine echten Daten ein.</strong>
+    </p>
 
-    <form id="loginForm">
-        <input type="text" id="user" placeholder="E-Mail oder Telefonnummer" required>
-        <input type="password" id="pass" placeholder="Passwort" required>
-        <button type="submit">Weiter</button>
+    <!-- WICHTIG: autocomplete aus -->
+    <form id="loginForm" autocomplete="off" novalidate>
+      <input
+        type="text"
+        id="username"
+        placeholder="Beispiel: vorname.nachname"
+        autocomplete="off"
+        inputmode="text"
+        required
+      />
+
+      <!-- kein type=password => weniger Passwortmanager-Prompts -->
+      <input
+        type="text"
+        id="password"
+        class="masked"
+        placeholder="Beispiel: Trainingscode"
+        autocomplete="off"
+        required
+      />
+
+      <div class="consent">
+        <input type="checkbox" id="consent" />
+        <label for="consent">
+          Ich bestätige, dass ich <strong>keine echten</strong> Zugangsdaten eingebe.
+        </label>
+      </div>
+
+      <!-- kein submit => kein klassisches Login-Signal -->
+      <button type="button" id="fakeLogin">Anmelden</button>
     </form>
 
+    <div class="demo-note">
+      Hinweis: Diese Seite ist eine <strong>Awareness‑Simulation</strong> und speichert keine Daten.
+    </div>
+  </div>
 
-
-<!-- WARNUNG -->
-<div class="warning-overlay" id="overlay">
+  <!-- Warn-Overlay -->
+  <div class="warning-overlay" id="warningOverlay">
     <div class="warning-box">
-        <h1>⚠️ PHISHING‑FALLE ⚠️</h1>
-        <p>Du hast soeben deine Zugangsdaten auf einer gefälschten Seite eingegeben.</p>
-        <ul>
+      <h1>⚠️ PHISHING‑FALLE! ⚠️</h1>
+      <p>Du hättest deine Daten auf einer gefälschten Seite eingegeben.</p>
+      <p>Ein Angreifer könnte damit dein Konto übernehmen.</p>
+
+      <div class="data-box">
+        <div>Beispiel‑Benutzer: <strong id="displayUser"></strong></div>
+        <div>Eingabe‑Länge: <strong id="displayPassLen"></strong> Zeichen (maskiert)</div>
+      </div>
+
+      <p style="font-size:13px; opacity:.95;">
+        Tipp: Prüfe Domain, Zertifikat, Absender und unerwartete Aufforderungen.
+      </p>
+
+      <button class="btn-close" onclick="closeWarning()">Verstanden</button>
+    </div>
+  </div>
+
+  <script>
+    const consent = document.getElementById("consent");
+    const btn = document.getElementById("fakeLogin");
+
+    // Button erst aktiv, wenn Zustimmung gesetzt
+    function refreshButton() {
+      if (consent.checked) {
+        btn.classList.add("enabled");
+      } else {
+        btn.classList.remove("enabled");
+      }
+    }
+    consent.addEventListener("change", refreshButton);
+    refreshButton();
+
+    // Optional: Paste in "Training-Code" verhindern (reduziert Risiko, echte Passwörter einzufügen)
+    document.getElementById("password").addEventListener("paste", (e) => e.preventDefault());
+
+    btn.addEventListener("click", function () {
+      if (!consent.checked) return;
+
+      // Daten lokal auslesen – aber Passwort NICHT anzeigen, nur Länge (didaktisch + sicher)
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value || "";
+
+      document.getElementById("displayUser").innerText = user || "(leer)";
+      document.getElementById("displayPassLen").innerText = String(pass.length);
+
+      document.getElementById("warningOverlay").style.display = "flex";
+    });
+
+    function closeWarning() {
+      document.getElementById("warningOverlay").style.display = "none";
+      document.getElementById("loginForm").reset();
+      refreshButton();
+    }
+  </script>
+</body>
+</html>
