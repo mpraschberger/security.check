@@ -1,183 +1,177 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sicherheits-Demo: Phishing erkennen</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #fafafa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-container {
-            background-color: #fff;
-            border: 1px solid #dbdbdb;
-            width: 350px;
-            padding: 40px;
-            text-align: center;
-            box-sizing: border-box;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        
-        /* Neues Logo-Styling */
-        .logo-container {
-            margin-bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        .logo-icon {
-            width: 70px;
-            height: 70px;
-        }
-        .logo-text {
-            font-size: 28px;
-            font-weight: 800;
-            color: #262626;
-            letter-spacing: -1px;
-            background: linear-gradient(45deg, #FF512F 0%, #DD2476 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sicherheits-Demo – Fake Google Login</title>
 
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid #dbdbdb;
-            border-radius: 6px;
-            background-color: #fafafa;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-        input:focus {
-            border-color: #a8a8a8;
-            outline: none;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #0095f6;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #1877f2;
-        }
-        .warning-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            color: white;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .warning-box {
-            background-color: #d9534f;
-            padding: 30px;
-            border-radius: 12px;
-            border: 2px solid white;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .warning-box h1 { margin-top: 0; font-size: 24px; }
-        .demo-note {
-            margin-top: 25px;
-            color: #8e8e8e;
-            font-size: 12px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-    </style>
+<style>
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f1f3f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    background-color: #ffffff;
+    width: 360px;
+    padding: 40px 35px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.logo-container {
+    margin-bottom: 25px;
+}
+
+.logo-icon {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 12px;
+}
+
+/* Google‑ähnlicher, aber eigener Text */
+.logo-text {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+
+.logo-text span:nth-child(1) { color: #4285f4; }
+.logo-text span:nth-child(2) { color: #ea4335; }
+.logo-text span:nth-child(3) { color: #fbbc05; }
+.logo-text span:nth-child(4) { color: #34a853; }
+
+.subtitle {
+    font-size: 14px;
+    color: #5f6368;
+    margin: 15px 0 25px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #dadce0;
+}
+
+input:focus {
+    outline: none;
+    border-color: #4285f4;
+}
+
+button {
+    width: 100%;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #1558b0;
+}
+
+.demo-note {
+    font-size: 11px;
+    color: #999;
+    margin-top: 25px;
+}
+
+/* PHISHING WARNUNG */
+.warning-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.warning-box {
+    background: #d93025;
+    color: white;
+    padding: 35px;
+    border-radius: 14px;
+    max-width: 420px;
+    text-align: center;
+}
+
+.warning-box h1 {
+    margin-top: 0;
+}
+
+.warning-box ul {
+    text-align: left;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.warning-box button {
+    margin-top: 20px;
+    background: white;
+    color: #d93025;
+}
+</style>
 </head>
+
 <body>
 
-    <div class="login-container">
-        <div class="logo-container">
-            <svg class="logo-icon" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#FF512F;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#DD2476;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <path d="M50,5 L10,25 L10,60 C10,80 50,95 50,95 C50,95 90,80 90,60 L90,25 L50,5 Z" fill="url(#grad1)" stroke="none"/>
-                <path d="M35,50 L45,60 L65,40" fill="none" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <div class="logo-text">VerifyBadge</div>
-        </div>
-        
-        <p style="font-size: 15px; color: #555; margin-bottom: 25px; line-height: 1.4;">
-            Melde dich an, um deinen<br><strong>blauen Haken</strong> zu beantragen.
-        </p>
+<div class="login-container">
+    <div class="logo-container">
+        <!-- Google‑ähnliches SVG‑Icon -->
+        <svg class="logo-icon" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="60" r="52" fill="#ffffff" stroke="#e0e0e0" stroke-width="4"/>
 
-        <form id="loginForm">
-            <input type="text" id="username" placeholder="Telefonnummer, Benutzername oder E-Mail" required>
-            <input type="password" id="password" placeholder="Passwort" required>
-            <button type="submit">Anmelden</button>
-        </form>
+            <path d="M60 12 A48 48 0 0 1 108 60"
+                  stroke="#4285f4" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <path d="M108 60 A48 48 0 0 1 60 108"
+                  stroke="#34a853" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <path d="M60 108 A48 48 0 0 1 12 60"
+                  stroke="#fbbc05" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <path d="M12 60 A48 48 0 0 1 60 12"
+                  stroke="#ea4335" stroke-width="10" fill="none" stroke-linecap="round"/>
 
-        <div class="demo-note">
-            Gültig für 24 Stunden.
+            <!-- Verifikations-Haken -->
+            <path d="M40 62 L54 76 L82 44"
+                  fill="none" stroke="#444" stroke-width="8"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
+        <div class="logo-text">
+            <span>S</span><span>e</span><span>a</span><span>rchVerify</span>
         </div>
     </div>
 
-    <div class="warning-overlay" id="warningOverlay">
-        <div class="warning-box">
-            <h1>⚠️ PHISHING-FALLE! ⚠️</h1>
-            <p>Du hast gerade deine Daten auf einer gefälschten Webseite eingegeben.</p>
-            <p>Wenn dies eine echte Phishing-Seite wäre, hätte der Angreifer jetzt:</p>
-            <ul style="text-align: left; display: inline-block; background: rgba(0,0,0,0.2); padding: 15px 25px; border-radius: 8px; margin: 15px 0;">
-                <li>Benutzername: <strong id="displayUser" style="color: #ffcccc;"></strong></li>
-                <li>Passwort: <strong id="displayPass" style="color: #ffcccc;"></strong></li>
-            </ul>
-            <p>Dein Account wäre jetzt sehr wahrscheinlich weg.</p>
-            <button onclick="closeWarning()" style="background-color: white; color: #d9534f; margin-top: 20px; font-weight: bold; border-radius: 6px;">Verstanden</button>
-        </div>
+    <div class="subtitle">
+        Konto verifizieren, um vollen Zugriff zu behalten
     </div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Verhindert, dass die Seite wirklich Daten sendet
-            
-            // Daten auslesen (nur für die lokale Anzeige)
-            var user = document.getElementById('username').value;
-            var pass = document.getElementById('password').value;
-            
-            // Daten im Warn-Overlay anzeigen
-            document.getElementById('displayUser').innerText = user;
-            document.getElementById('displayPass').innerText = pass;
-            
-            // Warn-Overlay anzeigen
-            document.getElementById('warningOverlay').style.display = 'flex';
-        });
+    <form id="loginForm">
+        <input type="text" id="user" placeholder="E-Mail oder Telefonnummer" required>
+        <input type="password" id="pass" placeholder="Passwort" required>
+        <button type="submit">Weiter</button>
+    </form>
 
-        function closeWarning() {
-            document.getElementById('warningOverlay').style.display = 'none';
-            document.getElementById('loginForm').reset(); // Formular leeren
-        }
-    </script>
+    <div class="demo-note">
+        ⚠️ Sicherheits‑Demo · keine echte Google‑Webseite
+    </div>
+</div>
 
-</body>
-</html>
+<!-- WARNUNG -->
+<div class="warning-overlay" id="overlay">
+    <div class="warning-box">
+        <h1>⚠️ PHISHING‑FALLE ⚠️</h1>
+        <p>Du hast soeben deine Zugangsdaten auf einer gefälschten Seite eingegeben.</p>
+        <ul>
